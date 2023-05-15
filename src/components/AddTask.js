@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme) => ({
     formButton: {
       margin: theme.spacing(1),
     },
+    formError: {
+        color: 'red'
+    }
 }));
 
 const AddTask = ({ onSave }) => {
@@ -27,13 +30,15 @@ const AddTask = ({ onSave }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [deadline, setDeadline] = useState("");
+    const [formError, setFormError] = useState("");
 
     const onSubmit = (e) => {
         e.preventDefault();
-
+        
         if (!issueType || !name || !description || !deadline) {
-            alert('Please fill all the fields')
+            setFormError('Please fill all the fields')
         } else {
+            setFormError('');
             const id = uuidv4();
 
             onSave({
@@ -42,7 +47,7 @@ const AddTask = ({ onSave }) => {
                 name,
                 description,
                 deadline,
-                component: "React App", // Set the task component
+                component: "React App",
             });
 
             setIssueType('');
@@ -53,8 +58,9 @@ const AddTask = ({ onSave }) => {
     }
 
     return (
-        <form className={classes.formContainer} onSubmit={onSubmit}>
+        <form className={classes.formContainer} onSubmit={onSubmit} data-testid="task-form">
             <h2>New Task</h2>
+            {formError && <p className={classes.formError} data-testid="form-error">{formError}</p>}
             <FormControl fullWidth>
                 <InputLabel id="issue-type-label">Issue Type</InputLabel>
                 <Select
@@ -103,6 +109,7 @@ const AddTask = ({ onSave }) => {
                 variant="contained"
                 color="primary"
                 type="submit"
+                data-testid="submit"
             >
             Create Task
             </Button>

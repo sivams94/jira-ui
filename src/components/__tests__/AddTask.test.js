@@ -1,18 +1,31 @@
-import { getByText, render, screen } from '@testing-library/react';
+import { getByText, render, screen, fireEvent } from '@testing-library/react';
+import {within} from '@testing-library/dom'
+import userEvent from "@testing-library/user-event";
+import { act } from "react-dom/test-utils";
 import AddTask from '../AddTask'
 
-test('should render input', () => {
-    const { getByTestId } = render(<AddTask />)
+let container = null;
 
-    const issueType  = getByTestId('issue-type')
-    expect(issueType).toBeInTheDocument()
+describe("task from", () => {
+    it('render 4 input components', () => {
+        const {getByTestId} = render(<AddTask/>);
 
-    const nameField  = getByTestId('name')
-    expect(nameField).toBeInTheDocument()
+        expect(getByTestId(/issue-type/i)).toBeInTheDocument();
+        expect(getByTestId(/name/i)).toBeInTheDocument();
+        expect(getByTestId(/description/i)).toBeInTheDocument();
+        expect(getByTestId(/deadline/i)).toBeInTheDocument();
+        expect(getByTestId("submit")).toBeInTheDocument();
+    });
 
-    const descriptionField  = getByTestId('description')
-    expect(descriptionField).toBeInTheDocument()
+    test("finding title", () => {
+        const onSubmit = jest.fn().mockImplementation((e) => {
+            e.persist();
+        });
+        const { container } = render(<AddTask onSubmit={onSubmit} />);
 
-    const deadlineField  = getByTestId('deadline')
-    expect(deadlineField).toBeInTheDocument()
+        fireEvent.submit(container.querySelector('form'));
+
+        const one = screen.getByTestId('form-error');
+        expect(one).toHaveTextContent('Please fill all the fields');
+    });
 });
